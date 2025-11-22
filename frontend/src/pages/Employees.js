@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import './Employees.css';
+
 export default function Employees({token}){
   const [emps,setEmps]=useState([]);
   const [form,setForm]=useState({first_name:'',last_name:'',phone:'',role:'field_worker',wage_type:'daily',wage_amount:0,farm_location:''});
@@ -9,9 +11,9 @@ export default function Employees({token}){
   useEffect(()=>{load();},[]);
   const add=async e=>{e.preventDefault(); await fetch('/api/employees',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(form)}); setForm({first_name:'',last_name:'',phone:'',role:'field_worker',wage_type:'daily',wage_amount:0,farm_location:''}); load();}
   const del=async id=>{ if(!confirm('Delete?')) return; await fetch('/api/employees/'+id,{method:'DELETE',headers:{Authorization:'Bearer '+token}}); load(); }
-  return (<div>
+  return (<div className="employees-container">
     <h2>Employees</h2>
-    <form onSubmit={add} style={{marginBottom:12}}>
+    <form onSubmit={add} className="add-employee-form">
       <input placeholder='First name' value={form.first_name} onChange={e=>setForm({...form,first_name:e.target.value})} required />
       <input placeholder='Last name' value={form.last_name} onChange={e=>setForm({...form,last_name:e.target.value})} />
       <input placeholder='Phone' value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} />
@@ -21,7 +23,29 @@ export default function Employees({token}){
       <input placeholder='Farm location' value={form.farm_location} onChange={e=>setForm({...form,farm_location:e.target.value})} />
       <button type='submit'>Add</button>
     </form>
-    <table border='1' cellPadding='6'><thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Wage</th><th>Location</th><th>Action</th></tr></thead>
-    <tbody>{emps.map(e=>(<tr key={e.id}><td>{e.id}</td><td>{e.first_name} {e.last_name}</td><td>{e.role}</td><td>{e.wage_type} - {e.wage_amount}</td><td>{e.farm_location}</td><td><button onClick={()=>del(e.id)}>Delete</button></td></tr>))}</tbody></table>
+    <table className="employees-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Wage</th>
+          <th>Location</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {emps.map(e=>(
+          <tr key={e.id}>
+            <td>{e.id}</td>
+            <td>{e.first_name} {e.last_name}</td>
+            <td>{e.role}</td>
+            <td>{e.wage_type} - {e.wage_amount}</td>
+            <td>{e.farm_location}</td>
+            <td><button className="delete-button" onClick={()=>del(e.id)}>Delete</button></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </div>)
 }
